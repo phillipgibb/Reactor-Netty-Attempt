@@ -10,10 +10,11 @@ import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 import io.netty.channel.ChannelOption;
@@ -26,14 +27,18 @@ import reactor.ipc.netty.NettyInbound;
 import reactor.ipc.netty.NettyOutbound;
 import reactor.ipc.netty.NettyPipeline;
 import reactor.ipc.netty.tcp.TcpServer;
+import reactor.spring.context.config.EnableReactor;
 import reactor.util.Logger;
 import reactor.util.Loggers;
+import za.co.phillip.netty.WebClient;
 import za.co.phillip.netty.handlers.CustomInBound;
 
-@SpringBootConfiguration
-@ComponentScan("com.moo")
-@PropertySource("classpath:application.properties")
-public class Configuration {
+@Configuration
+@EnableReactor
+@EnableConfigurationProperties
+@EnableAutoConfiguration
+@ComponentScan
+public class ReactorNettyConfiguration {
 
 	final Logger log = Loggers.getLogger(Configuration.class);
 
@@ -94,8 +99,13 @@ public class Configuration {
 	public StringDecoder stringDecoder() {
 		return new StringDecoder();
 	}
-
+	
 	@Bean
+	public WebClient webClient() {
+		return new WebClient();
+	}
+
+/*	@Bean
 	public NettyContext server() throws InterruptedException {
 		BiFunction<? super NettyInbound, ? super NettyOutbound, ? extends Publisher<Void>> serverHandler = (in,
 				out) -> {
@@ -111,6 +121,6 @@ public class Configuration {
 				.listen(tcpPort()));
 
 		return server.newHandler(serverHandler).block(Duration.ofSeconds(30));
-	}
+	}*/
 
 }
