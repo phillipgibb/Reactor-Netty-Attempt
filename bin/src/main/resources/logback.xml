@@ -14,9 +14,7 @@
   ~ limitations under the License.
   -->
 
-<configuration debug="true">
-    <include resource="org/springframework/boot/logging/logback/base.xml"/>
-    <logger name="org.springframework.web" level="DEBUG"/>
+<configuration>
 
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -38,8 +36,8 @@
 	<logger name="reactor" level="DEBUG"/>
     <!--<logger name="reactor" level="INFO"/>-->
     <logger name="reactor.ipc.netty" level="DEBUG" />
-    <logger name="reactor.ipc.netty.http.client.HttpClient" level="DEBUG" />
-    <logger name="reactor.ipc.netty.http.server.HttpServer" level="DEBUG" />
+    <logger name="reactor.ipc.netty.http.client.TcpClient" level="DEBUG" />
+    <logger name="reactor.ipc.netty.http.server.TcpServer" level="DEBUG" />
 
     <root level="debug">
         <appender-ref ref="stdout"/>

@@ -14,13 +14,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http.HttpRequestDecoder;
-import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpVersion;
 import reactor.core.publisher.Mono;
 import reactor.ipc.netty.NettyContext;
@@ -47,12 +45,20 @@ public class ApplicationTests {
 
 	private void startController() {
 
-		HttpServer server = HttpServer.create(opts -> opts.listen(8092).afterChannelInit(channelInit -> {
+		
+		
+		HttpServer server = HttpServer.create(opts -> opts.listen(8092)
+				.option(ChannelOption.SO_RCVBUF, 1024 * 1024)
+				.option(ChannelOption.SO_SNDBUF, 1024 * 1024)
+				.option(ChannelOption.SO_KEEPALIVE, true)
+				.afterChannelInit(channelInit -> {
 			ChannelPipeline pipeline = channelInit.pipeline();
-			pipeline.addLast("encoder", new HttpResponseEncoder());
-			pipeline.addLast("decoder", new HttpRequestDecoder());
-			pipeline.addLast("codec", new HttpServerCodec());
+//			pipeline.addLast("encoder", new HttpResponseEncoder());
+//			pipeline.addLast("decoder", new HttpRequestDecoder());
 			pipeline.addLast("aggregator", new HttpObjectAggregator(64 * 1024));
+			
+//			pipeline.addLast("codec", new HttpClientCodec());
+
 		}));
 
 		Mono<? extends NettyContext> context = server.newRouter(routes -> {
@@ -73,7 +79,7 @@ public class ApplicationTests {
 					.forEach(entry -> log.debug(String.format("header [%s=>%s]", entry.getKey(), entry.getValue())));
 
 			return resp/* .chunkedTransfer(true) */
-					.sendObject(req.receive().log("received").flatMap(data -> {
+					.sendObject(req.receiveContent().log("received").flatMap(data -> {
 						log.debug("Data-----------------" + data);
 						final StringBuilder responseContent = new StringBuilder().append(getResponse());// data.content().toString(Charset.defaultCharset())
 						log.debug(">" + String.format("%s from thread %s", getResponse(), Thread.currentThread()));
