@@ -24,11 +24,8 @@ public class ServerEndPoint implements Consumer<Channel> {
 		@Override
 	public void accept(Channel sc) {
 		this.pipeline = sc.pipeline();
-
-		
-		this.pipeline.addLast(new HttpObjectAggregator(4096));
+//		this.pipeline.addLast(new HttpObjectAggregator(4096));
 //		this.pipeline.addLast(new HttpServerCodec());
-
 //		this.pipeline.addLast(new ContentLengthHandler());
 	}
 
